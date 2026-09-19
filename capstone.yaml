@@ -1,0 +1,19 @@
+run: docker compose up --build
+seed: docker compose exec api python seed.py
+test: none — verified via EVIDENCE.md transcripts (tests optional per brief)
+base_url: http://localhost:8000
+
+endpoints:
+  - POST /generate
+      description: dummy billable action; requires Idempotency-Key header
+      body: { tenant_id, input_tokens, cached_input_tokens, output_tokens, reasoning_tokens }
+  - GET /usage
+      description: usage + cost rollup for a tenant
+      query: tenant_id
+  - POST /billing/checkout
+      description: creates a Stripe Checkout session (test mode / stripe-mock)
+      query: tenant_id
+  - POST /webhooks/stripe
+      description: Stripe webhook receiver — signature-verified, deduplicated
+  - GET /health
+      description: liveness check
