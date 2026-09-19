@@ -17,6 +17,12 @@ services:
       timeout: 5s
       retries: 5
 
+  stripe-mock:
+    image: stripe/stripe-mock:latest
+    ports:
+      - "12111:12111"
+      - "12112:12112"
+
   api:
     build: .
     env_file:
@@ -24,11 +30,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      stripe-mock:
+        condition: service_started
     ports:
       - "8000:8000"
     volumes:
       - ./app:/code/app
       - ./seed.py:/code/seed.py
+      - ./fixtures:/code/fixtures
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
